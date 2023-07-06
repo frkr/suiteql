@@ -1,8 +1,11 @@
-"use strict";
-var NetsuiteRest = require("netsuite-rest");
-const Readable = require("stream").Readable;
+import NetsuiteRest from "./netsuite-rest";
 
-module.exports = class suiteql extends NetsuiteRest {
+type QueryResult = {
+  items: any[];
+  hasMore: boolean;
+}
+
+export default class Suiteql extends NetsuiteRest {
   constructor(options) {
     if (typeof options !== "object")
       throw new TypeError("Please provide netsuite api credentials");
@@ -16,7 +19,7 @@ module.exports = class suiteql extends NetsuiteRest {
     });
   }
 
-  async query(string, limit = 1000, offset = 0) {
+  async query(string, limit = 1000, offset = 0): Promise<QueryResult> {
     let queryresult = {};
     if (typeof string !== "string")
       throw new TypeError("Query is not a string");
@@ -24,25 +27,18 @@ module.exports = class suiteql extends NetsuiteRest {
     // replace all \t with spaces as suggested in #5
     string = string.replace(/\t/g, ' ');
     string = string.replace(/\r?\n|\r/gm, "");
-    let bodycontent = `{"q": "${string}" }`;
+    let bodycontent = {q: string};
 
-    await this.request({
+    return await this.request({
       path: `query/v1/suiteql?limit=${limit}&offset=${offset}`,
       method: "POST",
       body: bodycontent,
-    }).then(async (response) => {
-      queryresult.items = response.data.items;
-      queryresult.hasMore = response.data.hasMore;
-    });
-    return queryresult;
+    }) as QueryResult
   }
 
   queryAll(string, limit = 1000) {
-    const stream = new Readable({
-      objectMode: true,
-      read() {},
-    });
     let offset = 0;
+    let stream = [];
     const getNextPage = async () => {
       let hasMore = true;
       while (hasMore === true) {
@@ -56,4 +52,4 @@ module.exports = class suiteql extends NetsuiteRest {
     getNextPage();
     return stream;
   }
-};
+}

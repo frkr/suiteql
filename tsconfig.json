@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "lib": [
+      "es2022"
+    ],
+    "module": "es2022",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "checkJs": false,
+    "isolatedModules": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+    //"preserveConstEnums": true,
+    //"esModuleInterop": true,
+    //"exclude": [
+    //  "node_modules",
+    //  "dist",
+    //  "build",
+    //  "novo"
+    //]
+  }
+}
